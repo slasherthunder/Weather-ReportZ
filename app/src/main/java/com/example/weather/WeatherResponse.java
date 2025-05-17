@@ -1,24 +1,25 @@
-package com.example.weather;
+package com.example.weather
 
-public class WeatherResponse {
-    private Main main;
-//    private List<Weather> weather;
-    private String name;
+class WeatherResponse {
+    var location: Location? = null
+    var current: Current? = null
 
-    // Getters and setters
-
-    public class Main {
-        private double temp;
-        private double humidity;
-
-        // Getters and setters
+    inner class Location {
+        var name: String? = null
+        var region: String? = null
+        var country: String? = null
     }
 
-    public class Weather {
-        private String main;
-        private String description;
-        private String icon;
+    inner class Current {
+        var temp_c: Double = 0.0
+        var temp_f: Double = 0.0
 
-        // Getters and setters
+        var condition: Condition? = null
+
+        inner class Condition {
+            var text: String? = null
+            var icon: String? = null
+        }
     }
 }
+
