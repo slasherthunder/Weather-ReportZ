@@ -13,6 +13,8 @@ class WeatherResponse {
     inner class Current {
         var temp_c: Double = 0.0
         var temp_f: Double = 0.0
+        var wind_mph: Double = 0.0
+        var humidity: Int = 0
 
         var condition: Condition? = null
 

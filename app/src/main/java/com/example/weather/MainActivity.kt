@@ -1,5 +1,6 @@
 package com.example.weather
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
@@ -11,13 +12,18 @@ import androidx.core.view.WindowInsetsCompat
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.widget.Button
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+
+import com.squareup.picasso.Picasso
+
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 class MainActivity : AppCompatActivity() {
     private lateinit var textViewWeather: TextView
     private val editTextLocation: EditText? = null
@@ -70,13 +76,31 @@ class MainActivity : AppCompatActivity() {
                     // Access your data here
                     val name = weatherData?.location?.name
                     val tempature = weatherData?.current?.temp_f
+                    val mph = weatherData?.current?.wind_mph
+                    val humidityValue = weatherData?.current?.humidity
+                    val description = weatherData?.current?.condition?.text
+                    val pic = weatherData?.current?.condition?.icon
+
                     Log.d("FindMe", tempature.toString())
                     val textTest = findViewById<TextView>(R.id.temperatureText)
-                    textTest.text = tempature.toString()
+                    textTest.text = tempature.toString() + "°F"
                     val cityTest = findViewById<TextView>(R.id.cityNameText)
                     cityTest.text = name.toString()
+                    val windSpeed = findViewById<TextView>(R.id.windText)
+                    windSpeed.text = mph.toString() + " mph"
+                    val humidityLabel = findViewById<TextView>(R.id.humidityText)
+                    humidityLabel.text = humidityValue.toString() + "%"
+                    val descriptionLabel = findViewById<TextView>(R.id.descriptionText)
+                    val weatherPic = findViewById<ImageView>(R.id.weatherIcon)
+                    descriptionLabel.text = description.toString()
+//                    Glide.with()
+//                        .load(weatherPic.toString()) // URL of the image
+//                        .into(weatherPic)
+                    Log.d("MyTag", "https:" + pic.toString())
 
-
+                    Picasso.get()
+                        .load("https:" + pic.toString())
+                        .into(weatherPic)
                     // Update your UI with the data
                 } else {
                     // Handle error
