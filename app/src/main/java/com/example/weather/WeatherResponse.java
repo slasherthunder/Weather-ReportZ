@@ -2,7 +2,7 @@ package com.example.weather;
 
 public class WeatherResponse {
     private Main main;
-    private List<Weather> weather;
+//    private List<Weather> weather;
     private String name;
 
     // Getters and setters
