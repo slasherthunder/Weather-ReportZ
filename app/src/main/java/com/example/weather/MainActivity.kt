@@ -12,7 +12,6 @@ import android.graphics.drawable.BitmapDrawable
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
@@ -130,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         viewFinder = findViewById(R.id.CAMERAAHHHH)
-        videoCaptureButton = findViewById(R.id.saturdayButton)
+        videoCaptureButton = findViewById(R.id.sundayButton)
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -142,8 +141,8 @@ class MainActivity : AppCompatActivity() {
 
 
         //Camera stuff
-        val previewView = findViewById<androidx.camera.view.PreviewView>(R.id.CAMERAAHHHH)
-        val recordButton = findViewById<ImageButton>(R.id.saturdayButton)
+//        val previewView = findViewById<androidx.camera.view.PreviewView>(R.id.CAMERAAHHHH)
+//        val recordButton = findViewById<ImageButton>(R.id.saturdayButton)
 
 //        recordButton.setOnClickListener {
 //            if (isRecording) {
@@ -208,24 +207,24 @@ class MainActivity : AppCompatActivity() {
         saturdayButton.setOnClickListener {
             makePhoneCall()
         }
-
-        // WEDNESDAY BUTTON - FRONT CAMERA picture
-        val wednesdayButton = findViewById<ImageButton>(R.id.wednesdayButton)
-        wednesdayButton.setOnClickListener {
-            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-            if (hasPermissions()) {
-                takePhoto()
-            } else {
-                requestPermissions()
-            }
-        }
+//
+//        // WEDNESDAY BUTTON - FRONT CAMERA picture
+//        val wednesdayButton = findViewById<ImageButton>(R.id.wednesdayButton)
+//        wednesdayButton.setOnClickListener {
+//            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+//            if (hasPermissions()) {
+//                takePhoto()
+//            } else {
+//                requestPermissions()
+//            }
+//        }
 
         // THURSDAY BUTTON - BACK CAMERA picture
         val thursdayButton = findViewById<ImageButton>(R.id.thursdayButton)
         thursdayButton.setOnClickListener {
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             if (hasPermissions()) {
-                takePhoto()
+//                takePhoto()
             } else {
                 requestPermissions()
             }
@@ -292,7 +291,7 @@ class MainActivity : AppCompatActivity() {
             if (hasPermissions()) {
 //                cameraProviderFuture.get()?.unbindAll()
 //                startCamera()
-                takePhoto()
+//                takePhoto()
 //                sendMmsWithImage("6194966341", "DONKEY DONG", takePhoto())
             } else {
                 requestPermissions()
@@ -310,7 +309,7 @@ class MainActivity : AppCompatActivity() {
             if (hasPermissions()) {
 //                cameraProviderFuture.get()?.unbindAll()
 //                startCamera()
-                takePhoto()
+//                takePhoto()
             } else {
                 requestPermissions()
             }
@@ -396,7 +395,8 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this, "Call failed: ${e.message}", Toast.LENGTH_SHORT).show()
 
-
+        }
+        }
     private fun captureVideo() {
         val currentRecording = recording
         if (currentRecording != null) {
@@ -458,6 +458,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
     }
+
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -572,22 +573,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* ========== SMS/MMS FUNCTIONALITY ========== */
-    private fun seeIfSMSHasPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.SEND_SMS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.SEND_SMS),
-                SMS_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            val imageUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
-            sendMmsWithImage("6194966341", "Whats Good", imageUri)
-        }
-    }
+//    private fun seeIfSMSHasPermission() {
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.SEND_SMS
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.SEND_SMS),
+//                SMS_PERMISSION_REQUEST_CODE
+//            )
+//        } else {
+//            val imageUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
+//            sendMmsWithImage("6194966341", "Whats Good", imageUri)
+//        }
+//    }
 
     private fun sendSms() {
         try {
@@ -692,88 +693,91 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startCamera() {
-        val previewView = findViewById<androidx.camera.view.PreviewView>(R.id.camera_preview)
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-
-            // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-
-            // ImageCapture
-            imageCapture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                .build()
-
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageCapture
-                )
-            } catch (exc: Exception) {
-                Log.e(TAG, "Camera binding failed", exc)
-        }
-        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                sendSms("Help MEEEEE")
-            } else {
-                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                getCurrentLocation()
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
-            } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-//        if (requestCode == SMS_MMS_PERMISSION_REQUEST_CODE &&
-//            grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-//            sendImageToNumber("6194966341") // Replace with recipient number
-//        } else {
-//            Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
-//        }
-//        when (requestCode) {
-//            REQUEST_CAMERA_CODE_PERMISSIONS -> {
-//                if (hasPermissions()) {
-//                    // Permissions granted, bind camera use cases
-//                    bindCameraUseCases()
-//                } else {
-//                    Toast.makeText(this, "Camera permissions denied", Toast.LENGTH_SHORT).show()
+//    private fun startCamera() {
+//        val previewView = findViewById<androidx.camera.view.PreviewView>(R.id.camera_preview)
+//        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+//
+//        cameraProviderFuture.addListener({
+//            val cameraProvider = cameraProviderFuture.get()
+//
+//            // Preview
+//            val preview = Preview.Builder()
+//                .build()
+//                .also {
+//                    it.setSurfaceProvider(previewView.surfaceProvider)
 //                }
 //
+//            // ImageCapture
+//            imageCapture = ImageCapture.Builder()
+//                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+//                .build()
+//
+//            try {
+//                cameraProvider.unbindAll()
+//                cameraProvider.bindToLifecycle(
+//                    this,
+//                    cameraSelector,
+//                    preview,
+//                    imageCapture
+//                )
+//            } catch (exc: Exception) {
+//                Log.e(TAG, "Camera binding failed", exc)
+//
 //            }
-//            }
-//            }
-//        if (requestCode == REQUEST_CAMERA_CODE_PERMISSIONS &&
-//            grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-//            bindCameraUseCases()
-//        } else {
-//            Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
 //        }
+//
+//        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
+//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                sendSms("Help MEEEEE")
+//            } else {
+//                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+////                getCurrentLocation()
+//            } else {
+//                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+//            if (allPermissionsGranted()) {
+//                startCamera()
+//            } else {
+//                Toast.makeText(this,
+//                    "Permissions not granted by the user.",
+//                    Toast.LENGTH_SHORT).show()
+//                finish()
+//            }
+//        }
+////        if (requestCode == SMS_MMS_PERMISSION_REQUEST_CODE &&
+////            grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+////            sendImageToNumber("6194966341") // Replace with recipient number
+////        } else {
+////            Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+////        }
+////        when (requestCode) {
+////            REQUEST_CAMERA_CODE_PERMISSIONS -> {
+////                if (hasPermissions()) {
+////                    // Permissions granted, bind camera use cases
+////                    bindCameraUseCases()
+////                } else {
+////                    Toast.makeText(this, "Camera permissions denied", Toast.LENGTH_SHORT).show()
+////                }
+////
+////            }
+////            }
+////            }
+////        if (requestCode == REQUEST_CAMERA_CODE_PERMISSIONS &&
+////            grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+////            bindCameraUseCases()
+////        } else {
+////            Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
+////        }
+//
+//    }
 
-    }
-
-    private fun takePhoto() {
+//    private fun takePhoto() {
 //    private fun startCameraPhoto() {
 //        val previewView = findViewById<androidx.camera.view.PreviewView>(R.id.camera_preview)
 //        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -809,41 +813,41 @@ class MainActivity : AppCompatActivity() {
 //        }, ContextCompat.getMainExecutor(this))
 //    }
 
-    private fun takePhoto(): Uri {
-        // 1. Create content values for MediaStore
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-            }
-        }
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(
-            contentResolver,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        ).build()
-        ) ?: run {
-            Toast.makeText(this, "Failed to create file", Toast.LENGTH_SHORT).show()
-            return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
-        }
-
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed", exc)
-                }
-
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    Toast.makeText(this@MainActivity, "Photo saved to gallery", Toast.LENGTH_SHORT).show()
-                }
-            }
-        )
-        return uri
-    }
+//    private fun takePhoto(): Uri {
+//        // 1. Create content values for MediaStore
+//        val contentValues = ContentValues().apply {
+//            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+//            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+//            }
+//        }
+//
+//        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+//            contentResolver,
+//            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//            contentValues
+//        ).build()
+//        ) ?: run {
+//            Toast.makeText(this, "Failed to create file", Toast.LENGTH_SHORT).show()
+//            return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
+//        }
+//
+//        imageCapture.takePicture(
+//            outputOptions,
+//            ContextCompat.getMainExecutor(this),
+//            object : ImageCapture.OnImageSavedCallback {
+//                override fun onError(exc: ImageCaptureException) {
+//                    Log.e(TAG, "Photo capture failed", exc)
+//                }
+//
+//                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+//                    Toast.makeText(this@MainActivity, "Photo saved to gallery", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        )
+//        return uri
+//    }
 
     private fun createImageFile(): File {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -856,22 +860,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     /* ========== WEATHER FUNCTIONALITY ========== */
-    private fun updateTemperatureDisplay(tempF: Float) {
-        val tempText = findViewById<TextView>(R.id.temperatureText)
-        if (isCelsius) {
-            val tempC = (tempF - 32) * 5 / 9
-            tempText.text = "%.1f°C".format(tempC)
-        } else {
-            tempText.text = "%.1f°F".format(tempF)
-        }
-    }
-
-    fun fetchWeather(place: String) {
-        val call = apiService.getCurrentWeather(APIKEY, place)
-//    companion object {
-//        private const val TAG = "CameraXApp"
-//        private const val REQUEST_CODE_PERMISSIONS = 10
+//    private fun updateTemperatureDisplay(tempF: Float) {
+//        val tempText = findViewById<TextView>(R.id.temperatureText)
+//        if (isCelsius) {
+//            val tempC = (tempF - 32) * 5 / 9
+//            tempText.text = "%.1f°C".format(tempC)
+//        } else {
+//            tempText.text = "%.1f°F".format(tempF)
+//        }
 //    }
+
+//    fun fetchWeather(place: String) {
+//        val call = apiService.getCurrentWeather(APIKEY, place)
+////    companion object {
+////        private const val TAG = "CameraXApp"
+////        private const val REQUEST_CODE_PERMISSIONS = 10
+////    }
 
     fun fetchWeather(place: String){
         val call  = apiService.getCurrentWeather(APIKEY, place)
