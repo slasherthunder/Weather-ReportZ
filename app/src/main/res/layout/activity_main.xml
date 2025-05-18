@@ -31,7 +31,7 @@
             android:id="@+id/cityNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="City Name"
+            android:text="City"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:textSize="36sp"
@@ -39,28 +39,18 @@
             android:textColor="@color/white"
             />
 
-        <ImageButton
-            android:id="@+id/weatherIcon"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_below="@id/cityNameText"
-            android:layout_centerHorizontal="true"
-            android:elevation="12dp"
-            android:src="@drawable/ic_storm"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="fitCenter"
-            android:padding="20dp"
-            android:contentDescription="Weather Icon" />
-
         <TextView
-            android:id="@+id/descriptionText"
+            android:id="@+id/temperatureText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/weatherIcon"
-            android:textColor="@color/white"
             android:layout_centerHorizontal="true"
-            android:text="Storm"
-            android:textSize="28sp" />
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="25"
+            android:textSize="60sp"
+            android:textStyle="bold"
+            android:textColor="#FFBF00"
+            android:layout_below="@id/cityNameText" />
 
         <LinearLayout
             android:id="@+id/detailsLayout"
@@ -68,10 +58,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_below="@id/descriptionText"
+            android:layout_below="@id/temperatureText"
             android:background="@drawable/background2"
-            android:padding="10dp"
-            android:layout_marginTop="20dp">
+            android:padding="10dp">
 
             <LinearLayout
                 android:id="@+id/humidityLayout"
@@ -86,7 +75,7 @@
                     android:id="@+id/humidityIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_half_humidity"
+                    android:src="@drawable/ic_humidity"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="fitCenter"
                     android:padding="10dp"
@@ -110,32 +99,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/tempLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/temperatureText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="25°"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFBF00" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Temperature"
-                    android:textSize="16sp"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/windLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -147,7 +110,7 @@
                     android:id="@+id/windIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_windspeed"
+                    android:src="@drawable/ic_wind"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="fitCenter"
                     android:padding="10dp"
@@ -185,11 +148,14 @@
             android:padding="20dp"
             android:contentDescription="Weather Icon" />
 
+<<<<<<< HEAD
         <androidx.camera.view.PreviewView
             android:id="@+id/camera_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+=======
+>>>>>>> parent of 683b8e3 (fwefef)
         <TextView
             android:id="@+id/descriptionText"
             android:layout_width="wrap_content"
@@ -204,7 +170,7 @@
             android:id="@+id/cityNameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/detailsLayout"
+            android:layout_below="@id/descriptionText"
             android:textColor="#EFEFEF"
             android:padding="12dp"
             android:textColorHint="#BFBFBF"
