@@ -85,14 +85,14 @@ class MainActivity : AppCompatActivity() {
         apiService = retrofit.create(WeatherApiService::class.java)
 
         //Button that changes city
-        val changeButton = findViewById<ImageButton>(R.id.thursdayButton)
+        val changeButton = findViewById<Button>(R.id.fetchWeatherButton)
         //When button is clicked
         changeButton.setOnClickListener {
 //            //Varible for the inputted location
-//            val region: String = findViewById<TextView>(R.id.cityNameInput).text.toString().trim()
-//            if (!region.isEmpty()){
-//                fetchWeather(region)
-//            }
+            val region: String = findViewById<TextView>(R.id.cityNameInput).text.toString().trim()
+            if (!region.isEmpty()){
+                fetchWeather(region)
+            }
 
 
         }
@@ -270,57 +270,57 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    fun fetchWeather(place: String){
+        val call  = apiService.getCurrentWeather(APIKEY, place)
+        call.enqueue(object : Callback<WeatherResponse> {
+            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                if (response.isSuccessful) {
+                    val weatherData = response.body()
+                    // Access your data here
+                    val name = weatherData?.location?.name
+                    val tempature = weatherData?.current?.temp_f
+                    val mph = weatherData?.current?.wind_mph
+                    val humidityValue = weatherData?.current?.humidity
+                    val description = weatherData?.current?.condition?.text
+                    val pic = weatherData?.current?.condition?.icon
+
+                    Log.d("FindMe", tempature.toString())
+                    val textTest = findViewById<TextView>(R.id.temperatureText)
+                    textTest.text = tempature.toString() + "°F"
+                    val cityTest = findViewById<TextView>(R.id.cityNameText)
+                    cityTest.text = name.toString()
+                    val windSpeed = findViewById<TextView>(R.id.windText)
+                    windSpeed.text = mph.toString() + " mph"
+                    val humidityLabel = findViewById<TextView>(R.id.humidityText)
+                    humidityLabel.text = humidityValue.toString() + "%"
+                    val descriptionLabel = findViewById<TextView>(R.id.descriptionText)
+                    val weatherPic = findViewById<ImageView>(R.id.weatherIcon)
+                    descriptionLabel.text = description.toString()
+//                    Glide.with()
+//                        .load(weatherPic.toString()) // URL of the image
+//                        .into(weatherPic)
+                    Log.d("MyTag", "https:" + pic.toString())
+
+                    Picasso.get()
+                        .load("https:" + pic.toString())
+                        .into(weatherPic)
+                    // Update your UI with the data
+                } else {
+                    // Handle error
+                    Log.e("API", "Error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                // Handle failure
+                Log.e("API", "Failure: ${t.message}")
+            }
+        })
 
     }
 
-//    fun fetchWeather(place: String){
-//        val call  = apiService.getCurrentWeather(APIKEY, place)
-//        call.enqueue(object : Callback<WeatherResponse> {
-//            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-//                if (response.isSuccessful) {
-//                    val weatherData = response.body()
-//                    // Access your data here
-//                    val name = weatherData?.location?.name
-//                    val tempature = weatherData?.current?.temp_f
-//                    val mph = weatherData?.current?.wind_mph
-//                    val humidityValue = weatherData?.current?.humidity
-//                    val description = weatherData?.current?.condition?.text
-//                    val pic = weatherData?.current?.condition?.icon
-//
-//                    Log.d("FindMe", tempature.toString())
-//                    val textTest = findViewById<TextView>(R.id.temperatureText)
-//                    textTest.text = tempature.toString() + "°F"
-//                    val cityTest = findViewById<TextView>(R.id.cityNameText)
-//                    cityTest.text = name.toString()
-//                    val windSpeed = findViewById<TextView>(R.id.windText)
-//                    windSpeed.text = mph.toString() + " mph"
-//                    val humidityLabel = findViewById<TextView>(R.id.humidityText)
-//                    humidityLabel.text = humidityValue.toString() + "%"
-//                    val descriptionLabel = findViewById<TextView>(R.id.descriptionText)
-//                    val weatherPic = findViewById<ImageView>(R.id.weatherIcon)
-//                    descriptionLabel.text = description.toString()
-////                    Glide.with()
-////                        .load(weatherPic.toString()) // URL of the image
-////                        .into(weatherPic)
-//                    Log.d("MyTag", "https:" + pic.toString())
-//
-////                    Picasso.get()
-////                        .load("https:" + pic.toString())
-////                        .into(weatherPic)
-//                    // Update your UI with the data
-//                } else {
-//                    // Handle error
-//                    Log.e("API", "Error: ${response.code()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-//                // Handle failure
-//                Log.e("API", "Failure: ${t.message}")
-//            }
-//        })
-//
-//    }
+    }
+
 
 
 
