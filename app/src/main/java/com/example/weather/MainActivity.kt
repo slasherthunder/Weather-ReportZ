@@ -349,7 +349,7 @@ class MainActivity : AppCompatActivity() {
     private fun showUserGuide() {
         val guideMessage = """
         Monday sends a "I am not okay" text to the authorities.
-        Tuesday starts recording a video from the back camera, clicking on it again will stop the video.
+        Sunday starts recording a video from the back camera, clicking on it again will stop the video.
         Clicking on the current weather icon sends the current location to a saved number.
         Saturday starts a call to 911
 
