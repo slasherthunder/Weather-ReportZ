@@ -1,6 +1,5 @@
 package com.example.weather
 
-
 //Image stuff
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
@@ -22,6 +21,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -43,9 +43,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.google.common.util.concurrent.ListenableFuture
-
+import android.widget.LinearLayout
 import com.squareup.picasso.Picasso
-
+import android.widget.RelativeLayout
+import android.widget.RadioGroup
+import android.widget.RadioButton
+import android.widget.Switch
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,10 +72,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var apiService: WeatherApiService
 
     private val APIKEY = "bd19138f2a75421f88535220251705"
+    private var isSettingsVisible = false
+    private var isCelsius = false // Default to Fahrenheit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        // Initialize settings panel
+        val settingsPanel = findViewById<LinearLayout>(R.id.settingsPanel)
+        val btnCloseSettings = findViewById<Button>(R.id.btn_close_settings)
+        val mainLayout = findViewById<RelativeLayout>(R.id.main)
+        val tempUnitGroup = findViewById<RadioGroup>(R.id.tempUnitGroup)
+        val radioCelsius = findViewById<RadioButton>(R.id.radio_celsius)
+        val radioFahrenheit = findViewById<RadioButton>(R.id.radio_fahrenheit)
+        val switchHumidity = findViewById<Switch>(R.id.switch_humidity)
+        val switchWind = findViewById<Switch>(R.id.switch_wind)
 
         //Storm text
         val test = findViewById<TextView>(R.id.descriptionText)
@@ -84,6 +100,44 @@ class MainActivity : AppCompatActivity() {
 
         apiService = retrofit.create(WeatherApiService::class.java)
 
+        // Settings button click listener
+        val settingsButton = findViewById<ImageButton>(R.id.settingsButton)
+        settingsButton.setOnClickListener {
+            settingsPanel.visibility = View.VISIBLE
+            mainLayout.alpha = 0.5f
+            mainLayout.isClickable = false
+        }
+
+        // Close settings button click listener
+        btnCloseSettings.setOnClickListener {
+            settingsPanel.visibility = View.GONE
+            mainLayout.alpha = 1f
+            mainLayout.isClickable = true
+        }
+
+        // Temperature unit change listener
+        tempUnitGroup.setOnCheckedChangeListener { _, checkedId ->
+            isCelsius = checkedId == R.id.radio_celsius
+            // Update current temperature display
+            val currentTempText = findViewById<TextView>(R.id.temperatureText).text.toString()
+            if (currentTempText.isNotEmpty() && currentTempText != "N/A") {
+                val tempValue = currentTempText.replace("°F", "").replace("°C", "").trim().toFloatOrNull()
+                tempValue?.let {
+                    updateTemperatureDisplay(it)
+                }
+            }
+        }
+
+        // Humidity switch listener
+        switchHumidity.setOnCheckedChangeListener { _, isChecked ->
+            findViewById<LinearLayout>(R.id.humidityLayout).visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
+        // Wind switch listener
+        switchWind.setOnCheckedChangeListener { _, isChecked ->
+            findViewById<LinearLayout>(R.id.windLayout).visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
         //Button that changes city
         val changeButton = findViewById<Button>(R.id.fetchWeatherButton)
         //When button is clicked
@@ -93,8 +147,6 @@ class MainActivity : AppCompatActivity() {
             if (!region.isEmpty()){
                 fetchWeather(region)
             }
-
-
         }
 
         val captureButton = findViewById<ImageButton>(R.id.thursdayButton)
@@ -129,11 +181,20 @@ class MainActivity : AppCompatActivity() {
             requestPermissions()
         }
 
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+    }
+
+    private fun updateTemperatureDisplay(tempF: Float) {
+        val tempText = findViewById<TextView>(R.id.temperatureText)
+        if (isCelsius) {
+            val tempC = (tempF - 32) * 5 / 9
+            tempText.text = "%.1f°C".format(tempC)
+        } else {
+            tempText.text = "%.1f°F".format(tempF)
         }
     }
 
@@ -267,9 +328,6 @@ class MainActivity : AppCompatActivity() {
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 
-
-
-
     fun fetchWeather(place: String){
         val call  = apiService.getCurrentWeather(APIKEY, place)
         call.enqueue(object : Callback<WeatherResponse> {
@@ -286,7 +344,16 @@ class MainActivity : AppCompatActivity() {
 
                     Log.d("FindMe", tempature.toString())
                     val textTest = findViewById<TextView>(R.id.temperatureText)
-                    textTest.text = tempature.toString() + "°F"
+                    if (tempature != null) {
+                        if (isCelsius) {
+                            val tempC = (tempature - 32) * 5 / 9
+                            textTest.text = "%.1f°C".format(tempC)
+                        } else {
+                            textTest.text = "%.1f°F".format(tempature)
+                        }
+                    } else {
+                        textTest.text = "N/A"
+                    }
                     val cityTest = findViewById<TextView>(R.id.cityNameText)
                     cityTest.text = name.toString()
                     val windSpeed = findViewById<TextView>(R.id.windText)
@@ -296,10 +363,16 @@ class MainActivity : AppCompatActivity() {
                     val descriptionLabel = findViewById<TextView>(R.id.descriptionText)
                     val weatherPic = findViewById<ImageView>(R.id.weatherIcon)
                     descriptionLabel.text = description.toString()
-//                    Glide.with()
-//                        .load(weatherPic.toString()) // URL of the image
-//                        .into(weatherPic)
-                    Log.d("MyTag", "https:" + pic.toString())
+
+                    // Update humidity icon based on humidity value
+                    val humidityIcon = findViewById<ImageView>(R.id.humidityIcon)
+                    humidityValue?.let { humidity ->
+                        when {
+                            humidity < 20 -> humidityIcon.setImageResource(R.drawable.ic_no_humidity)
+                            humidity in 20..60 -> humidityIcon.setImageResource(R.drawable.ic_half_humidity)
+                            humidity > 60 -> humidityIcon.setImageResource(R.drawable.ic_full_humidity)
+                        }
+                    }
 
                     Picasso.get()
                         .load("https:" + pic.toString())
@@ -316,20 +389,5 @@ class MainActivity : AppCompatActivity() {
                 Log.e("API", "Failure: ${t.message}")
             }
         })
-
     }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

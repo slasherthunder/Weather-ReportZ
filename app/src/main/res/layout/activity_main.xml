@@ -16,41 +16,172 @@
         <!-- Settings Button -->
         <ImageButton
             android:id="@+id/settingsButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_storm"
+            android:src="@drawable/ic_settings"
             android:contentDescription="Settings"
-            android:scaleType="fitCenter"
-            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:padding="0dp"
             android:tint="@color/white"/>
+
+        <!-- Settings Panel (initially hidden) -->
+        <LinearLayout
+            android:id="@+id/settingsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="#F5F5F5"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            android:elevation="8dp">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="24sp"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Temperature Unit Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Temperature Unit"
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <RadioGroup
+                    android:id="@+id/tempUnitGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/radio_celsius"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Celsius"
+                        android:checked="true"/>
+
+                    <RadioButton
+                        android:id="@+id/radio_fahrenheit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fahrenheit"/>
+                </RadioGroup>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Humidity And Wind Speed"
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp">
+
+                <Switch
+                    android:id="@+id/switch_humidity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Humidity"
+                    android:checked="true"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp">
+
+                <Switch
+                    android:id="@+id/switch_wind"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Wind Speed"
+                    android:checked="true"/>
+            </LinearLayout>
+
+            <!-- Close Button -->
+            <Button
+                android:id="@+id/btn_close_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Close Settings"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#4CAF50"
+                android:textColor="#FFFFFF"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/cityNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="City"
+            android:text="City Name"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:textSize="36sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
-            />
+            android:textColor="@color/white"/>
 
         <TextView
-            android:id="@+id/temperatureText"
+            android:id="@+id/currentWeatherLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Current Weather Today"
+            android:layout_below="@id/cityNameText"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="25"
-            android:textSize="60sp"
-            android:textStyle="bold"
-            android:textColor="#FFBF00"
-            android:layout_below="@id/cityNameText" />
+            android:textSize="24sp"
+            android:textColor="@color/white"/>
+
+        <ImageButton
+            android:id="@+id/weatherIcon"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_below="@id/currentWeatherLabel"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:elevation="12dp"
+            android:src="@drawable/ic_storm"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:padding="20dp"
+            android:contentDescription="Weather Icon" />
+
+        <TextView
+            android:id="@+id/descriptionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weatherIcon"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:text="Storm"
+            android:textSize="28sp" />
 
         <LinearLayout
             android:id="@+id/detailsLayout"
@@ -58,10 +189,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_below="@id/temperatureText"
+            android:layout_below="@id/descriptionText"
             android:background="@drawable/background2"
             android:padding="10dp">
 
+            <!-- Humidity -->
             <LinearLayout
                 android:id="@+id/humidityLayout"
                 android:layout_width="wrap_content"
@@ -75,7 +207,7 @@
                     android:id="@+id/humidityIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_humidity"
+                    android:src="@drawable/ic_half_humidity"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="fitCenter"
                     android:padding="10dp"
@@ -98,6 +230,44 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
+            <!-- Temperature -->
+            <LinearLayout
+                android:id="@+id/temperatureLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/tempIcon"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/thermometer"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="fitCenter"
+                    android:padding="10dp"
+                    android:contentDescription="Temperature"/>
+
+                <TextView
+                    android:id="@+id/temperatureText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25°"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Temperature"
+                    android:textSize="16sp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <!-- Wind -->
             <LinearLayout
                 android:id="@+id/windLayout"
                 android:layout_width="wrap_content"
@@ -110,7 +280,7 @@
                     android:id="@+id/windIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_wind"
+                    android:src="@drawable/ic_windspeed"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:scaleType="fitCenter"
                     android:padding="10dp"
@@ -134,44 +304,20 @@
             </LinearLayout>
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/weatherIcon"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_below="@id/detailsLayout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:elevation="12dp"
-            android:src="@drawable/ic_storm"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="fitCenter"
-            android:padding="20dp"
-            android:contentDescription="Weather Icon" />
-
         <androidx.camera.view.PreviewView
             android:visibility="invisible"
             android:id="@+id/camera_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <TextView
-            android:id="@+id/descriptionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/weatherIcon"
-            android:textColor="@color/white"
-            android:layout_centerHorizontal="true"
-            android:text="Storm"
-            android:textSize="28sp" />
-
         <EditText
             android:id="@+id/cityNameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/descriptionText"
-            android:textColor="#EFEFEF"
+            android:layout_below="@id/detailsLayout"
+            android:textColor="#FFFAFA"
             android:padding="12dp"
-            android:textColorHint="#BFBFBF"
+            android:textColorHint="#FFFAFA"
             android:gravity="center"
             android:textSize="24sp"
             android:layout_marginTop="20dp"
@@ -232,7 +378,7 @@
                         android:id="@+id/mondayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/sunny"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -241,7 +387,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="24°"
+                        android:text="72°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -264,7 +410,7 @@
                         android:id="@+id/tuesdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/cloudwithsun"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -273,7 +419,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="22°"
+                        android:text="69°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -297,7 +443,7 @@
                         android:id="@+id/wednesdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/sunny"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -306,7 +452,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="19°"
+                        android:text="85°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -330,7 +476,7 @@
                         android:id="@+id/thursdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/sunny"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -339,7 +485,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="21°"
+                        android:text="90°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -363,7 +509,7 @@
                         android:id="@+id/fridayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/cloudwithsun"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -372,7 +518,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="25°"
+                        android:text="70°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -396,7 +542,7 @@
                         android:id="@+id/saturdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/cloudwithsun"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -405,7 +551,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="23°"
+                        android:text="69°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
@@ -429,7 +575,7 @@
                         android:id="@+id/sundayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/ic_storm"
+                        android:src="@drawable/cloudwithsun"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:scaleType="fitCenter"
                         android:padding="10dp"
@@ -438,7 +584,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="18°"
+                        android:text="69°F"
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                 </LinearLayout>
