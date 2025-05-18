@@ -47,7 +47,8 @@ dependencies {
     // If using Kotlin, add this annotation processor:
 //    kapt ("com.github.bumptech.glide:compiler:4.16.0")
 
-
+    implementation("com.google.android.gms:play-services-location:21.0.1")// Gets info of location from google location services
+    implementation("com.guolindev.permissionx:permissionx:1.7.1")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.google.code.gson:gson:2.8.9")
@@ -58,6 +59,7 @@ dependencies {
     implementation ("androidx.camera:camera-camera2:${camerax_version}")
     implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation ("androidx.camera:camera-view:${camerax_version}")
+    implementation ("androidx.camera:camera-video:${camerax_version}")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
