@@ -6,6 +6,9 @@ import androidx.camera.core.CameraSelector
 import java.util.concurrent.Executors
 import android.media.MediaScannerConnection
 
+import androidx.core.net.toUri
+import android.telephony.SmsManager
+import android.graphics.drawable.BitmapDrawable
 
 import android.Manifest
 import android.app.Activity
@@ -63,6 +66,8 @@ import java.util.Locale
 import kotlin.text.get
 
 class MainActivity : AppCompatActivity() {
+    private val SMS_PERMISSION_REQUEST_CODE = 101
+
     private lateinit var textViewWeather: TextView
     private val editTextLocation: EditText? = null
     private var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -106,6 +111,12 @@ class MainActivity : AppCompatActivity() {
             settingsPanel.visibility = View.VISIBLE
             mainLayout.alpha = 0.5f
             mainLayout.isClickable = false
+        }
+
+        //MONDAY BUTTON SEND MESSAGE CONFIGURATION
+        var mondayButton = findViewById<ImageButton>(R.id.mondayButton)
+        mondayButton.setOnClickListener {
+            seeIfSMSHasPermission()
         }
 
         // Close settings button click listener
@@ -224,6 +235,13 @@ class MainActivity : AppCompatActivity() {
                 startCamera()
             } else {
                 Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show()
+            }
+        }
+        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendSms()
+            } else {
+                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -390,4 +408,156 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+
+
+
+
+
+
+
+
+    private fun seeIfSMSHasPermission(){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.SEND_SMS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.SEND_SMS),
+                SMS_PERMISSION_REQUEST_CODE
+            )
+        } else {
+//            sendSms() // Permission already granted
+//            val imageUri = getImageUriFromDrawable(R.drawable.ic_humidity)
+            val imageUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
+            sendMmsWithImage("6194966341", "Whats Good", imageUri)
+        }
+    }
+
+    private fun sendSms() {
+        try {
+            val phoneNumber = "6194966341" // Replace with recipient number
+            val message = "i LOVEVEEEEEEEE children"
+
+
+            val smsManager: SmsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                this.getSystemService(SmsManager::class.java)
+            } else {
+                SmsManager.getDefault()
+            }
+
+            smsManager.sendTextMessage(
+                phoneNumber,
+                null, // Optional SMS service center number (use null for default)
+                message,
+                null, // Optional pending intent for sent status
+                null  // Optional pending intent for delivery status
+            )
+
+            Toast.makeText(this, "SMS sent successfully!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to send SMS: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+    fun getImageUriFromDrawable(drawableId: Int): Uri {
+        return try {
+            // 1. Safely get drawable and convert to bitmap
+            val drawable = ContextCompat.getDrawable(this, drawableId) ?:
+            throw IllegalStateException("Drawable not found")
+
+            val bitmap = (drawable as? BitmapDrawable)?.bitmap ?:
+            throw IllegalStateException("Drawable is not a bitmap")
+
+            // 2. Create cache directory if needed
+            val cacheDir = File(externalCacheDir?.path ?: cacheDir.path, "shared_images").apply {
+                if (!exists()) mkdirs()
+            }
+
+            // 3. Create temp file
+            val file = File(cacheDir, "img_${System.currentTimeMillis()}.jpg").apply {
+                createNewFile()
+            }
+
+            // 4. Compress and save
+            file.outputStream().use { os ->
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 85, os)) {
+                    throw IOException("Failed to compress bitmap")
+                }
+            }
+
+            // 5. Generate URI (with fallback)
+            try {
+                FileProvider.getUriForFile(
+                    this,
+                    "${packageName}.fileprovider", // NOTE: Changed from '.provider' to match standard
+                    file
+                )
+            } catch (e: IllegalArgumentException) {
+                Uri.fromFile(file) // Fallback for testing only (won't work on Android 7+)
+            }
+        } catch (e: Exception) {
+            Log.e("ImageUri", "Error creating URI: ${e.message}")
+            throw e // Or return a default URI if preferred
+        }
+    }
+    // Usage:
+
+    private fun sendMmsWithImage(phoneNumber: String, message: String, imageUri: Uri) {
+        try {
+            sendSms()
+            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                getSystemService(SmsManager::class.java)
+            } else {
+                SmsManager.getDefault()
+            }
+
+            // For newer Android versions
+
+            smsManager.sendMultimediaMessage(
+                this,
+                imageUri,
+                "image/*",
+                null,
+                null
+            )
+
+//            else {
+//                // For older versions (may not work on all devices)
+//                val parts = ArrayList<Uri>().apply { add(imageUri) }
+//                smsManager.sendMultimediaMessage(
+//                    this,
+//                    phoneNumber,
+//                    null,
+//                    parts,
+//                    message,
+//                    null
+//                )
+//            }
+            Toast.makeText(this, "MMS with image sent", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "MMS failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
