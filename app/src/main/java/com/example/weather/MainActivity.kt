@@ -31,6 +31,7 @@ import androidx.core.view.WindowInsetsCompat
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.ImageCapture
@@ -61,6 +62,7 @@ import kotlin.text.get
 class MainActivity : AppCompatActivity() {
     private lateinit var textViewWeather: TextView
     private val editTextLocation: EditText? = null
+    private var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var imageCapture: ImageCapture
@@ -83,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         apiService = retrofit.create(WeatherApiService::class.java)
 
         //Button that changes city
-        val changeButton = findViewById<Button>(R.id.fetchWeatherButton)
+        val changeButton = findViewById<ImageButton>(R.id.thursdayButton)
         //When button is clicked
         changeButton.setOnClickListener {
 //            //Varible for the inputted location
@@ -95,9 +97,26 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        val captureButton = findViewById<Button>(R.id.fetchWeatherButton)
+        val captureButton = findViewById<ImageButton>(R.id.thursdayButton)
+        val captureFrontButton = findViewById<ImageButton>(R.id.wednesdayButton)
+
         captureButton.setOnClickListener {
+            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
             if (hasPermissions()) {
+//                cameraProviderFuture.get()?.unbindAll()
+//                startCamera()
+                takePhoto()
+            } else {
+                requestPermissions()
+            }
+        }
+
+        captureFrontButton.setOnClickListener {
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            if (hasPermissions()) {
+//                cameraProviderFuture.get()?.unbindAll()
+//                startCamera()
                 takePhoto()
             } else {
                 requestPermissions()
@@ -168,7 +187,6 @@ class MainActivity : AppCompatActivity() {
                 .build()
 
             // Select back camera
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 cameraProvider.unbindAll()
