@@ -71,7 +71,7 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/humidityIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -106,7 +106,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center">
-                <ImageButton
+                <ImageView
                     android:id="@+id/windIcon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
