@@ -228,6 +228,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/mondayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -259,6 +260,7 @@
                         android:textColor="@color/white"
                         android:textSize="16sp"/>
                     <ImageButton
+                        android:id="@+id/tuesdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -291,6 +293,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/wednesdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -323,6 +326,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/thursdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -355,6 +359,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/fridayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -387,6 +392,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/saturdayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
@@ -419,6 +425,7 @@
                         android:textSize="16sp"/>
 
                     <ImageButton
+                        android:id="@+id/sundayButton"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_storm"
