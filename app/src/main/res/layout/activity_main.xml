@@ -24,8 +24,7 @@
             android:src="@drawable/ic_settings"
             android:contentDescription="Settings"
             android:scaleType="fitXY"
-            android:padding="0dp"
-            android:tint="@color/white"/>
+            android:padding="0dp"/>
 
         <!-- Settings Panel (initially hidden) -->
         <LinearLayout
@@ -33,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="#F5F5F5"
+            android:background="#000300"
             android:orientation="vertical"
             android:padding="16dp"
             android:visibility="gone"
@@ -45,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:text="Settings"
                 android:textSize="24sp"
-                android:textColor="#333333"
+                android:textColor="#C3C1C1"
                 android:textStyle="bold"
                 android:layout_marginBottom="24dp"/>
 
@@ -55,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="Temperature Unit"
                 android:textSize="16sp"
-                android:textColor="#666666"
+                android:textColor="#C3C1C1"
                 android:layout_marginBottom="8dp"/>
 
             <LinearLayout
@@ -76,6 +75,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Celsius"
+                        android:textColor="#FFFFFF"
                         android:checked="true"/>
 
                     <RadioButton
@@ -83,7 +83,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textColor="#FFFFFF"
                         android:text="Fahrenheit"/>
+
                 </RadioGroup>
             </LinearLayout>
 
@@ -92,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:text="Humidity And Wind Speed"
                 android:textSize="16sp"
-                android:textColor="#666666"
+                android:textColor="#FFFFFF"
                 android:layout_marginBottom="8dp"/>
 
             <LinearLayout
@@ -108,6 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Enable Humidity"
+                    android:textColor="#FFFFFF"
                     android:checked="true"/>
             </LinearLayout>
 
@@ -124,6 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Enable Wind Speed"
+                    android:textColor="#FFFFFF"
                     android:checked="true"/>
             </LinearLayout>
 
@@ -134,8 +138,24 @@
                 android:layout_height="wrap_content"
                 android:text="Close Settings"
                 android:layout_marginTop="16dp"
-                android:backgroundTint="#4CAF50"
-                android:textColor="#FFFFFF"/>
+                android:backgroundTint="#C3C1C1"
+                android:textColor="#000500"/>
+
+            <!-- New Guide Button -->
+            <Button
+                android:id="@+id/btn_guide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="User Guide"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#C3C1C1"
+                android:textColor="#000500"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Extra space to ensure the guide button is off-screen initially -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="400dp"/>
         </LinearLayout>
 
         <TextView
@@ -590,6 +610,5 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
     </RelativeLayout>
 </ScrollView>

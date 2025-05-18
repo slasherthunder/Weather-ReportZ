@@ -1,6 +1,6 @@
 package com.example.weather
 
-//Image stuff
+// Image stuff
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import java.util.concurrent.Executors
@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.appcompat.app.AlertDialog
 import java.io.File
 import java.io.IOException
 import java.util.Date
@@ -67,6 +68,7 @@ import kotlin.text.get
 
 class MainActivity : AppCompatActivity() {
     private val SMS_PERMISSION_REQUEST_CODE = 101
+    private val CALL_PERMISSION_REQUEST_CODE = 102
 
     private lateinit var textViewWeather: TextView
     private val editTextLocation: EditText? = null
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private val APIKEY = "bd19138f2a75421f88535220251705"
     private var isSettingsVisible = false
     private var isCelsius = false // Default to Fahrenheit
+    // Add this new function to your MainActivity class:
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +100,10 @@ class MainActivity : AppCompatActivity() {
 
         //Storm text
         val test = findViewById<TextView>(R.id.descriptionText)
-
+        val btnGuide = findViewById<Button>(R.id.btn_guide)
+        btnGuide.setOnClickListener {
+            showUserGuide()
+        }
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.weatherapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -113,10 +119,38 @@ class MainActivity : AppCompatActivity() {
             mainLayout.isClickable = false
         }
 
-        //MONDAY BUTTON SEND MESSAGE CONFIGURATION
-        var mondayButton = findViewById<ImageButton>(R.id.mondayButton)
+        // MONDAY BUTTON - Starts taking video using the front camera
+        val mondayButton = findViewById<ImageButton>(R.id.mondayButton)
         mondayButton.setOnClickListener {
             seeIfSMSHasPermission()
+        }
+
+        // TUESDAY BUTTON - Starts taking video using the back camera
+        val saturdayButton = findViewById<ImageButton>(R.id.saturdayButton)
+        saturdayButton.setOnClickListener {
+            makePhoneCall()
+        }
+
+        // WEDNESDAY BUTTON - FRONT CAMERA picture
+        val wednesdayButton = findViewById<ImageButton>(R.id.wednesdayButton)
+        wednesdayButton.setOnClickListener {
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            if (hasPermissions()) {
+                takePhoto()
+            } else {
+                requestPermissions()
+            }
+        }
+
+        // THURSDAY BUTTON - BACK CAMERA picture
+        val thursdayButton = findViewById<ImageButton>(R.id.thursdayButton)
+        thursdayButton.setOnClickListener {
+            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            if (hasPermissions()) {
+                takePhoto()
+            } else {
+                requestPermissions()
+            }
         }
 
         // Close settings button click listener
@@ -153,40 +187,14 @@ class MainActivity : AppCompatActivity() {
         val changeButton = findViewById<Button>(R.id.fetchWeatherButton)
         //When button is clicked
         changeButton.setOnClickListener {
-//            //Varible for the inputted location
             val region: String = findViewById<TextView>(R.id.cityNameInput).text.toString().trim()
             if (!region.isEmpty()){
                 fetchWeather(region)
             }
         }
 
-        val captureButton = findViewById<ImageButton>(R.id.thursdayButton)
-        val captureFrontButton = findViewById<ImageButton>(R.id.wednesdayButton)
-
-        captureButton.setOnClickListener {
-            cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            if (hasPermissions()) {
-//                cameraProviderFuture.get()?.unbindAll()
-//                startCamera()
-                takePhoto()
-            } else {
-                requestPermissions()
-            }
-        }
-
-        captureFrontButton.setOnClickListener {
-            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-            if (hasPermissions()) {
-//                cameraProviderFuture.get()?.unbindAll()
-//                startCamera()
-                takePhoto()
-            } else {
-                requestPermissions()
-            }
-        }
         // Request permissions
-        if ( hasPermissions()) {
+        if (hasPermissions()) {
             startCamera()
         } else {
             requestPermissions()
@@ -198,28 +206,142 @@ class MainActivity : AppCompatActivity() {
             insets
         }
     }
+    private fun showUserGuide() {
+        val guideMessage = """
+        Monday sends a "I am not okay" text to the authorities.
+        Tuesday starts recording a video from the back camera, clicking on it again will stop the video.
+        Clicking on the current weather icon sends the current location to a saved number.
+        Saturday starts a call to 911
 
-    private fun updateTemperatureDisplay(tempF: Float) {
-        val tempText = findViewById<TextView>(R.id.temperatureText)
-        if (isCelsius) {
-            val tempC = (tempF - 32) * 5 / 9
-            tempText.text = "%.1f°C".format(tempC)
-        } else {
-            tempText.text = "%.1f°F".format(tempF)
+    """.trimIndent()
+
+        AlertDialog.Builder(this)
+            .setTitle("User Guide")
+            .setMessage(guideMessage)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+    /* ========== CALL FUNCTIONALITY ========== */
+    private fun checkCallPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CALL_PHONE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCallPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CALL_PHONE),
+            CALL_PERMISSION_REQUEST_CODE
+        )
+    }
+
+    private fun makePhoneCall() {
+        val phoneNumber = "6194966341" // Replace with the number you want to call
+
+        try {
+            if (checkCallPermission()) {
+                val callIntent = Intent(Intent.ACTION_CALL).apply {
+                    data = Uri.parse("tel:$phoneNumber")
+                }
+                startActivity(callIntent)
+            } else {
+                requestCallPermission()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Call failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
+    /* ========== SMS/MMS FUNCTIONALITY ========== */
+    private fun seeIfSMSHasPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.SEND_SMS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.SEND_SMS),
+                SMS_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            val imageUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
+            sendMmsWithImage("6194966341", "Whats Good", imageUri)
+        }
+    }
+
+    private fun sendSms() {
+        try {
+            val phoneNumber = "6194966341"
+            val message = "i LOVEVEEEEEEEE children"
+
+            val smsManager: SmsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                this.getSystemService(SmsManager::class.java)
+            } else {
+                SmsManager.getDefault()
+            }
+
+            smsManager.sendTextMessage(
+                phoneNumber,
+                null,
+                message,
+                null,
+                null
+            )
+
+            Toast.makeText(this, "SMS sent successfully!", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to send SMS: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun sendMmsWithImage(phoneNumber: String, message: String, imageUri: Uri) {
+        try {
+            sendSms()
+            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                getSystemService(SmsManager::class.java)
+            } else {
+                SmsManager.getDefault()
+            }
+
+            smsManager.sendMultimediaMessage(
+                this,
+                imageUri,
+                "image/*",
+                null,
+                null
+            )
+
+            Toast.makeText(this, "MMS with image sent", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "MMS failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /* ========== CAMERA FUNCTIONALITY ========== */
     private fun hasPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermissions() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.CAMERA),
+            arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ),
             REQUEST_CODE_PERMISSIONS
         )
     }
@@ -230,18 +352,28 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (hasPermissions()) {
-                startCamera()
-            } else {
-                Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show()
+
+        when (requestCode) {
+            REQUEST_CODE_PERMISSIONS -> {
+                if (hasPermissions()) {
+                    startCamera()
+                } else {
+                    Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                sendSms()
-            } else {
-                Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
+            SMS_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    sendSms()
+                } else {
+                    Toast.makeText(this, "SMS permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+            CALL_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    makePhoneCall()
+                } else {
+                    Toast.makeText(this, "Call permission denied", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -265,8 +397,6 @@ class MainActivity : AppCompatActivity() {
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
 
-            // Select back camera
-
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
@@ -282,7 +412,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhoto() {
-        // 1. Create content values for MediaStore
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -290,23 +419,13 @@ class MainActivity : AppCompatActivity() {
                 put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
             }
         }
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(
-            contentResolver,                      // ContentResolver
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,  // Save collection URI
-            contentValues                         // ContentValues
-        ).build()
 
-        // 2. Get the content resolver and insert the entry
-        val contentResolver = applicationContext.contentResolver
-        val uri = contentResolver.insert(
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            contentResolver,
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
-        ) ?: run {
-            Toast.makeText(this, "Failed to create file", Toast.LENGTH_SHORT).show()
-            return
-        }
+        ).build()
 
-        // 3. Take the picture and save to MediaStore
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
@@ -321,38 +440,24 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
-    private fun createImageFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_${timeStamp}_",
-            ".jpg",
-            storageDir
-        )
-    }
 
-    private fun notifyGallery(file: File) {
-        MediaScannerConnection.scanFile(
-            this,
-            arrayOf(file.absolutePath),
-            arrayOf("image/jpeg")
-        ) { _, uri ->
-            Log.d(TAG, "Image scanned with URI: $uri")
+    /* ========== WEATHER FUNCTIONALITY ========== */
+    private fun updateTemperatureDisplay(tempF: Float) {
+        val tempText = findViewById<TextView>(R.id.temperatureText)
+        if (isCelsius) {
+            val tempC = (tempF - 32) * 5 / 9
+            tempText.text = "%.1f°C".format(tempC)
+        } else {
+            tempText.text = "%.1f°F".format(tempF)
         }
     }
 
-    companion object {
-        private const val TAG = "CameraXApp"
-        private const val REQUEST_CODE_PERMISSIONS = 10
-    }
-
-    fun fetchWeather(place: String){
-        val call  = apiService.getCurrentWeather(APIKEY, place)
+    fun fetchWeather(place: String) {
+        val call = apiService.getCurrentWeather(APIKEY, place)
         call.enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 if (response.isSuccessful) {
                     val weatherData = response.body()
-                    // Access your data here
                     val name = weatherData?.location?.name
                     val tempature = weatherData?.current?.temp_f
                     val mph = weatherData?.current?.wind_mph
@@ -360,7 +465,6 @@ class MainActivity : AppCompatActivity() {
                     val description = weatherData?.current?.condition?.text
                     val pic = weatherData?.current?.condition?.icon
 
-                    Log.d("FindMe", tempature.toString())
                     val textTest = findViewById<TextView>(R.id.temperatureText)
                     if (tempature != null) {
                         if (isCelsius) {
@@ -372,6 +476,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         textTest.text = "N/A"
                     }
+
                     val cityTest = findViewById<TextView>(R.id.cityNameText)
                     cityTest.text = name.toString()
                     val windSpeed = findViewById<TextView>(R.id.windText)
@@ -395,169 +500,19 @@ class MainActivity : AppCompatActivity() {
                     Picasso.get()
                         .load("https:" + pic.toString())
                         .into(weatherPic)
-                    // Update your UI with the data
                 } else {
-                    // Handle error
                     Log.e("API", "Error: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                // Handle failure
                 Log.e("API", "Failure: ${t.message}")
             }
         })
     }
 
-
-
-
-
-
-
-
-
-    private fun seeIfSMSHasPermission(){
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.SEND_SMS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.SEND_SMS),
-                SMS_PERMISSION_REQUEST_CODE
-            )
-        } else {
-//            sendSms() // Permission already granted
-//            val imageUri = getImageUriFromDrawable(R.drawable.ic_humidity)
-            val imageUri = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat_cropped.jpg/640px-June_odd-eyed-cat_cropped.jpg".toUri()
-            sendMmsWithImage("6194966341", "Whats Good", imageUri)
-        }
+    companion object {
+        private const val TAG = "CameraXApp"
+        private const val REQUEST_CODE_PERMISSIONS = 10
     }
-
-    private fun sendSms() {
-        try {
-            val phoneNumber = "6194966341" // Replace with recipient number
-            val message = "i LOVEVEEEEEEEE children"
-
-
-            val smsManager: SmsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                this.getSystemService(SmsManager::class.java)
-            } else {
-                SmsManager.getDefault()
-            }
-
-            smsManager.sendTextMessage(
-                phoneNumber,
-                null, // Optional SMS service center number (use null for default)
-                message,
-                null, // Optional pending intent for sent status
-                null  // Optional pending intent for delivery status
-            )
-
-            Toast.makeText(this, "SMS sent successfully!", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Failed to send SMS: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-
-    fun getImageUriFromDrawable(drawableId: Int): Uri {
-        return try {
-            // 1. Safely get drawable and convert to bitmap
-            val drawable = ContextCompat.getDrawable(this, drawableId) ?:
-            throw IllegalStateException("Drawable not found")
-
-            val bitmap = (drawable as? BitmapDrawable)?.bitmap ?:
-            throw IllegalStateException("Drawable is not a bitmap")
-
-            // 2. Create cache directory if needed
-            val cacheDir = File(externalCacheDir?.path ?: cacheDir.path, "shared_images").apply {
-                if (!exists()) mkdirs()
-            }
-
-            // 3. Create temp file
-            val file = File(cacheDir, "img_${System.currentTimeMillis()}.jpg").apply {
-                createNewFile()
-            }
-
-            // 4. Compress and save
-            file.outputStream().use { os ->
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 85, os)) {
-                    throw IOException("Failed to compress bitmap")
-                }
-            }
-
-            // 5. Generate URI (with fallback)
-            try {
-                FileProvider.getUriForFile(
-                    this,
-                    "${packageName}.fileprovider", // NOTE: Changed from '.provider' to match standard
-                    file
-                )
-            } catch (e: IllegalArgumentException) {
-                Uri.fromFile(file) // Fallback for testing only (won't work on Android 7+)
-            }
-        } catch (e: Exception) {
-            Log.e("ImageUri", "Error creating URI: ${e.message}")
-            throw e // Or return a default URI if preferred
-        }
-    }
-    // Usage:
-
-    private fun sendMmsWithImage(phoneNumber: String, message: String, imageUri: Uri) {
-        try {
-            sendSms()
-            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                getSystemService(SmsManager::class.java)
-            } else {
-                SmsManager.getDefault()
-            }
-
-            // For newer Android versions
-
-            smsManager.sendMultimediaMessage(
-                this,
-                imageUri,
-                "image/*",
-                null,
-                null
-            )
-
-//            else {
-//                // For older versions (may not work on all devices)
-//                val parts = ArrayList<Uri>().apply { add(imageUri) }
-//                smsManager.sendMultimediaMessage(
-//                    this,
-//                    phoneNumber,
-//                    null,
-//                    parts,
-//                    message,
-//                    null
-//                )
-//            }
-            Toast.makeText(this, "MMS with image sent", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "MMS failed: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
